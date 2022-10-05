@@ -1,0 +1,1272 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 4.1.0 #12072 (Mac OS X x86_64)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module testparking
+                                      6 	.optsdcc -mmcs51 --model-small
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _ExitSpot
+                                     12 	.globl _TimeUnit
+                                     13 	.globl _and
+                                     14 	.globl _GotSpot
+                                     15 	.globl _Car
+                                     16 	.globl _timer0_ISR
+                                     17 	.globl __mcs51_genXRAMCLEAR
+                                     18 	.globl __mcs51_genXINIT
+                                     19 	.globl __mcs51_genRAMCLEAR
+                                     20 	.globl __sdcc_gsinit_startup
+                                     21 	.globl _main
+                                     22 	.globl _Consumer
+                                     23 	.globl _Car5
+                                     24 	.globl _Car4
+                                     25 	.globl _Car3
+                                     26 	.globl _Car2
+                                     27 	.globl _Car1
+                                     28 	.globl _delay
+                                     29 	.globl _ThreadExit
+                                     30 	.globl _ThreadCreate
+                                     31 	.globl _CY
+                                     32 	.globl _AC
+                                     33 	.globl _F0
+                                     34 	.globl _RS1
+                                     35 	.globl _RS0
+                                     36 	.globl _OV
+                                     37 	.globl _F1
+                                     38 	.globl _P
+                                     39 	.globl _PS
+                                     40 	.globl _PT1
+                                     41 	.globl _PX1
+                                     42 	.globl _PT0
+                                     43 	.globl _PX0
+                                     44 	.globl _RD
+                                     45 	.globl _WR
+                                     46 	.globl _T1
+                                     47 	.globl _T0
+                                     48 	.globl _INT1
+                                     49 	.globl _INT0
+                                     50 	.globl _TXD
+                                     51 	.globl _RXD
+                                     52 	.globl _P3_7
+                                     53 	.globl _P3_6
+                                     54 	.globl _P3_5
+                                     55 	.globl _P3_4
+                                     56 	.globl _P3_3
+                                     57 	.globl _P3_2
+                                     58 	.globl _P3_1
+                                     59 	.globl _P3_0
+                                     60 	.globl _EA
+                                     61 	.globl _ES
+                                     62 	.globl _ET1
+                                     63 	.globl _EX1
+                                     64 	.globl _ET0
+                                     65 	.globl _EX0
+                                     66 	.globl _P2_7
+                                     67 	.globl _P2_6
+                                     68 	.globl _P2_5
+                                     69 	.globl _P2_4
+                                     70 	.globl _P2_3
+                                     71 	.globl _P2_2
+                                     72 	.globl _P2_1
+                                     73 	.globl _P2_0
+                                     74 	.globl _SM0
+                                     75 	.globl _SM1
+                                     76 	.globl _SM2
+                                     77 	.globl _REN
+                                     78 	.globl _TB8
+                                     79 	.globl _RB8
+                                     80 	.globl _TI
+                                     81 	.globl _RI
+                                     82 	.globl _P1_7
+                                     83 	.globl _P1_6
+                                     84 	.globl _P1_5
+                                     85 	.globl _P1_4
+                                     86 	.globl _P1_3
+                                     87 	.globl _P1_2
+                                     88 	.globl _P1_1
+                                     89 	.globl _P1_0
+                                     90 	.globl _TF1
+                                     91 	.globl _TR1
+                                     92 	.globl _TF0
+                                     93 	.globl _TR0
+                                     94 	.globl _IE1
+                                     95 	.globl _IT1
+                                     96 	.globl _IE0
+                                     97 	.globl _IT0
+                                     98 	.globl _P0_7
+                                     99 	.globl _P0_6
+                                    100 	.globl _P0_5
+                                    101 	.globl _P0_4
+                                    102 	.globl _P0_3
+                                    103 	.globl _P0_2
+                                    104 	.globl _P0_1
+                                    105 	.globl _P0_0
+                                    106 	.globl _B
+                                    107 	.globl _ACC
+                                    108 	.globl _PSW
+                                    109 	.globl _IP
+                                    110 	.globl _P3
+                                    111 	.globl _IE
+                                    112 	.globl _P2
+                                    113 	.globl _SBUF
+                                    114 	.globl _SCON
+                                    115 	.globl _P1
+                                    116 	.globl _TH1
+                                    117 	.globl _TH0
+                                    118 	.globl _TL1
+                                    119 	.globl _TL0
+                                    120 	.globl _TMOD
+                                    121 	.globl _TCON
+                                    122 	.globl _PCON
+                                    123 	.globl _DPH
+                                    124 	.globl _DPL
+                                    125 	.globl _SP
+                                    126 	.globl _P0
+                                    127 	.globl _now
+                                    128 	.globl _bitmap
+                                    129 	.globl _CarSpot
+                                    130 	.globl _CarOut
+                                    131 	.globl _CarIn
+                                    132 	.globl _spots
+                                    133 	.globl _spotsSync
+                                    134 	.globl _sem
+                                    135 ;--------------------------------------------------------
+                                    136 ; special function registers
+                                    137 ;--------------------------------------------------------
+                                    138 	.area RSEG    (ABS,DATA)
+      000000                        139 	.org 0x0000
+                           000080   140 _P0	=	0x0080
+                           000081   141 _SP	=	0x0081
+                           000082   142 _DPL	=	0x0082
+                           000083   143 _DPH	=	0x0083
+                           000087   144 _PCON	=	0x0087
+                           000088   145 _TCON	=	0x0088
+                           000089   146 _TMOD	=	0x0089
+                           00008A   147 _TL0	=	0x008a
+                           00008B   148 _TL1	=	0x008b
+                           00008C   149 _TH0	=	0x008c
+                           00008D   150 _TH1	=	0x008d
+                           000090   151 _P1	=	0x0090
+                           000098   152 _SCON	=	0x0098
+                           000099   153 _SBUF	=	0x0099
+                           0000A0   154 _P2	=	0x00a0
+                           0000A8   155 _IE	=	0x00a8
+                           0000B0   156 _P3	=	0x00b0
+                           0000B8   157 _IP	=	0x00b8
+                           0000D0   158 _PSW	=	0x00d0
+                           0000E0   159 _ACC	=	0x00e0
+                           0000F0   160 _B	=	0x00f0
+                                    161 ;--------------------------------------------------------
+                                    162 ; special function bits
+                                    163 ;--------------------------------------------------------
+                                    164 	.area RSEG    (ABS,DATA)
+      000000                        165 	.org 0x0000
+                           000080   166 _P0_0	=	0x0080
+                           000081   167 _P0_1	=	0x0081
+                           000082   168 _P0_2	=	0x0082
+                           000083   169 _P0_3	=	0x0083
+                           000084   170 _P0_4	=	0x0084
+                           000085   171 _P0_5	=	0x0085
+                           000086   172 _P0_6	=	0x0086
+                           000087   173 _P0_7	=	0x0087
+                           000088   174 _IT0	=	0x0088
+                           000089   175 _IE0	=	0x0089
+                           00008A   176 _IT1	=	0x008a
+                           00008B   177 _IE1	=	0x008b
+                           00008C   178 _TR0	=	0x008c
+                           00008D   179 _TF0	=	0x008d
+                           00008E   180 _TR1	=	0x008e
+                           00008F   181 _TF1	=	0x008f
+                           000090   182 _P1_0	=	0x0090
+                           000091   183 _P1_1	=	0x0091
+                           000092   184 _P1_2	=	0x0092
+                           000093   185 _P1_3	=	0x0093
+                           000094   186 _P1_4	=	0x0094
+                           000095   187 _P1_5	=	0x0095
+                           000096   188 _P1_6	=	0x0096
+                           000097   189 _P1_7	=	0x0097
+                           000098   190 _RI	=	0x0098
+                           000099   191 _TI	=	0x0099
+                           00009A   192 _RB8	=	0x009a
+                           00009B   193 _TB8	=	0x009b
+                           00009C   194 _REN	=	0x009c
+                           00009D   195 _SM2	=	0x009d
+                           00009E   196 _SM1	=	0x009e
+                           00009F   197 _SM0	=	0x009f
+                           0000A0   198 _P2_0	=	0x00a0
+                           0000A1   199 _P2_1	=	0x00a1
+                           0000A2   200 _P2_2	=	0x00a2
+                           0000A3   201 _P2_3	=	0x00a3
+                           0000A4   202 _P2_4	=	0x00a4
+                           0000A5   203 _P2_5	=	0x00a5
+                           0000A6   204 _P2_6	=	0x00a6
+                           0000A7   205 _P2_7	=	0x00a7
+                           0000A8   206 _EX0	=	0x00a8
+                           0000A9   207 _ET0	=	0x00a9
+                           0000AA   208 _EX1	=	0x00aa
+                           0000AB   209 _ET1	=	0x00ab
+                           0000AC   210 _ES	=	0x00ac
+                           0000AF   211 _EA	=	0x00af
+                           0000B0   212 _P3_0	=	0x00b0
+                           0000B1   213 _P3_1	=	0x00b1
+                           0000B2   214 _P3_2	=	0x00b2
+                           0000B3   215 _P3_3	=	0x00b3
+                           0000B4   216 _P3_4	=	0x00b4
+                           0000B5   217 _P3_5	=	0x00b5
+                           0000B6   218 _P3_6	=	0x00b6
+                           0000B7   219 _P3_7	=	0x00b7
+                           0000B0   220 _RXD	=	0x00b0
+                           0000B1   221 _TXD	=	0x00b1
+                           0000B2   222 _INT0	=	0x00b2
+                           0000B3   223 _INT1	=	0x00b3
+                           0000B4   224 _T0	=	0x00b4
+                           0000B5   225 _T1	=	0x00b5
+                           0000B6   226 _WR	=	0x00b6
+                           0000B7   227 _RD	=	0x00b7
+                           0000B8   228 _PX0	=	0x00b8
+                           0000B9   229 _PT0	=	0x00b9
+                           0000BA   230 _PX1	=	0x00ba
+                           0000BB   231 _PT1	=	0x00bb
+                           0000BC   232 _PS	=	0x00bc
+                           0000D0   233 _P	=	0x00d0
+                           0000D1   234 _F1	=	0x00d1
+                           0000D2   235 _OV	=	0x00d2
+                           0000D3   236 _RS0	=	0x00d3
+                           0000D4   237 _RS1	=	0x00d4
+                           0000D5   238 _F0	=	0x00d5
+                           0000D6   239 _AC	=	0x00d6
+                           0000D7   240 _CY	=	0x00d7
+                                    241 ;--------------------------------------------------------
+                                    242 ; overlayable register banks
+                                    243 ;--------------------------------------------------------
+                                    244 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                        245 	.ds 8
+                                    246 ;--------------------------------------------------------
+                                    247 ; internal ram data
+                                    248 ;--------------------------------------------------------
+                                    249 	.area DSEG    (DATA)
+                           000021   250 _sem	=	0x0021
+                           000022   251 _spotsSync	=	0x0022
+                           000023   252 _spots	=	0x0023
+                           000025   253 _CarIn	=	0x0025
+                           00004A   254 _CarOut	=	0x004a
+                           00005A   255 _CarSpot	=	0x005a
+                           000035   256 _bitmap	=	0x0035
+                           00003F   257 _now	=	0x003f
+                                    258 ;--------------------------------------------------------
+                                    259 ; overlayable items in internal ram 
+                                    260 ;--------------------------------------------------------
+                                    261 ;--------------------------------------------------------
+                                    262 ; Stack segment in internal ram 
+                                    263 ;--------------------------------------------------------
+                                    264 	.area	SSEG
+      000021                        265 __start__stack:
+      000021                        266 	.ds	1
+                                    267 
+                                    268 ;--------------------------------------------------------
+                                    269 ; indirectly addressable internal ram data
+                                    270 ;--------------------------------------------------------
+                                    271 	.area ISEG    (DATA)
+                                    272 ;--------------------------------------------------------
+                                    273 ; absolute internal ram data
+                                    274 ;--------------------------------------------------------
+                                    275 	.area IABS    (ABS,DATA)
+                                    276 	.area IABS    (ABS,DATA)
+                                    277 ;--------------------------------------------------------
+                                    278 ; bit data
+                                    279 ;--------------------------------------------------------
+                                    280 	.area BSEG    (BIT)
+                                    281 ;--------------------------------------------------------
+                                    282 ; paged external ram data
+                                    283 ;--------------------------------------------------------
+                                    284 	.area PSEG    (PAG,XDATA)
+                                    285 ;--------------------------------------------------------
+                                    286 ; external ram data
+                                    287 ;--------------------------------------------------------
+                                    288 	.area XSEG    (XDATA)
+                                    289 ;--------------------------------------------------------
+                                    290 ; absolute external ram data
+                                    291 ;--------------------------------------------------------
+                                    292 	.area XABS    (ABS,XDATA)
+                                    293 ;--------------------------------------------------------
+                                    294 ; external initialized ram data
+                                    295 ;--------------------------------------------------------
+                                    296 	.area XISEG   (XDATA)
+                                    297 	.area HOME    (CODE)
+                                    298 	.area GSINIT0 (CODE)
+                                    299 	.area GSINIT1 (CODE)
+                                    300 	.area GSINIT2 (CODE)
+                                    301 	.area GSINIT3 (CODE)
+                                    302 	.area GSINIT4 (CODE)
+                                    303 	.area GSINIT5 (CODE)
+                                    304 	.area GSINIT  (CODE)
+                                    305 	.area GSFINAL (CODE)
+                                    306 	.area CSEG    (CODE)
+                                    307 ;--------------------------------------------------------
+                                    308 ; interrupt vector 
+                                    309 ;--------------------------------------------------------
+                                    310 	.area HOME    (CODE)
+      000000                        311 __interrupt_vect:
+      000000 02 03 D3         [24]  312 	ljmp	__sdcc_gsinit_startup
+      000003 32               [24]  313 	reti
+      000004                        314 	.ds	7
+      00000B 02 03 DA         [24]  315 	ljmp	_timer0_ISR
+                                    316 ;--------------------------------------------------------
+                                    317 ; global & static initialisations
+                                    318 ;--------------------------------------------------------
+                                    319 	.area HOME    (CODE)
+                                    320 	.area GSINIT  (CODE)
+                                    321 	.area GSFINAL (CODE)
+                                    322 	.area GSINIT  (CODE)
+                                    323 	.globl __sdcc_gsinit_startup
+                                    324 	.globl __sdcc_program_startup
+                                    325 	.globl __start__stack
+                                    326 	.globl __mcs51_genXINIT
+                                    327 	.globl __mcs51_genXRAMCLEAR
+                                    328 	.globl __mcs51_genRAMCLEAR
+                                    329 	.area GSFINAL (CODE)
+      000011 02 00 0E         [24]  330 	ljmp	__sdcc_program_startup
+                                    331 ;--------------------------------------------------------
+                                    332 ; Home
+                                    333 ;--------------------------------------------------------
+                                    334 	.area HOME    (CODE)
+                                    335 	.area HOME    (CODE)
+      00000E                        336 __sdcc_program_startup:
+      00000E 02 03 5B         [24]  337 	ljmp	_main
+                                    338 ;	return from main will return to caller
+                                    339 ;--------------------------------------------------------
+                                    340 ; code
+                                    341 ;--------------------------------------------------------
+                                    342 	.area CSEG    (CODE)
+                                    343 ;------------------------------------------------------------
+                                    344 ;Allocation info for local variables in function 'Car1'
+                                    345 ;------------------------------------------------------------
+                                    346 ;	testparking.c:19: void Car1(void){
+                                    347 ;	-----------------------------------------
+                                    348 ;	 function Car1
+                                    349 ;	-----------------------------------------
+      000014                        350 _Car1:
+                           000007   351 	ar7 = 0x07
+                           000006   352 	ar6 = 0x06
+                           000005   353 	ar5 = 0x05
+                           000004   354 	ar4 = 0x04
+                           000003   355 	ar3 = 0x03
+                           000002   356 	ar2 = 0x02
+                           000001   357 	ar1 = 0x01
+                           000000   358 	ar0 = 0x00
+                                    359 ;	testparking.c:20: SemaphoreWait(sem);
+      000014                        360 		0$:
+      000014 E5 21            [12]  361 	mov a, _sem 
+      000016 60 FC            [24]  362 	jz 0$ 
+      000018 20 E7 F9         [24]  363 	jb ACC.7, 0$ 
+      00001B 15 21            [12]  364 	dec _sem 
+                                    365 ;	testparking.c:22: EA=0;
+                                    366 ;	assignBit
+      00001D C2 AF            [12]  367 	clr	_EA
+                                    368 ;	testparking.c:23: SemaphoreWait(spotsSync);
+      00001F                        369 		1$:
+      00001F E5 22            [12]  370 	mov a, _spotsSync 
+      000021 60 FC            [24]  371 	jz 1$ 
+      000023 20 E7 F9         [24]  372 	jb ACC.7, 1$ 
+      000026 15 22            [12]  373 	dec _spotsSync 
+                                    374 ;	testparking.c:24: if(spots[0]=='X') {
+      000028 74 58            [12]  375 	mov	a,#0x58
+      00002A B5 23 08         [24]  376 	cjne	a,_spots,00102$
+                                    377 ;	testparking.c:25: spots[0] = '1';
+      00002D 75 23 31         [24]  378 	mov	_spots,#0x31
+                                    379 ;	testparking.c:26: CarSpot[0] = '0';
+      000030 75 5A 30         [24]  380 	mov	_CarSpot,#0x30
+      000033 80 06            [24]  381 	sjmp	00103$
+      000035                        382 00102$:
+                                    383 ;	testparking.c:28: spots[1] = '1';
+      000035 75 24 31         [24]  384 	mov	(_spots + 0x0001),#0x31
+                                    385 ;	testparking.c:29: CarSpot[0] = '1';
+      000038 75 5A 31         [24]  386 	mov	_CarSpot,#0x31
+      00003B                        387 00103$:
+                                    388 ;	testparking.c:31: CarIn[0] = now;
+      00003B 85 3F 25         [24]  389 	mov	_CarIn,_now
+                                    390 ;	testparking.c:32: SemaphoreSignal(spotsSync);
+      00003E 05 22            [12]  391 	inc _spotsSync 
+                                    392 ;	testparking.c:33: EA=1;
+                                    393 ;	assignBit
+      000040 D2 AF            [12]  394 	setb	_EA
+                                    395 ;	testparking.c:35: delay(7);
+      000042 75 82 07         [24]  396 	mov	dpl,#0x07
+      000045 12 05 DC         [24]  397 	lcall	_delay
+                                    398 ;	testparking.c:37: EA=0;
+                                    399 ;	assignBit
+      000048 C2 AF            [12]  400 	clr	_EA
+                                    401 ;	testparking.c:38: SemaphoreWait(spotsSync);
+      00004A                        402 		2$:
+      00004A E5 22            [12]  403 	mov a, _spotsSync 
+      00004C 60 FC            [24]  404 	jz 2$ 
+      00004E 20 E7 F9         [24]  405 	jb ACC.7, 2$ 
+      000051 15 22            [12]  406 	dec _spotsSync 
+                                    407 ;	testparking.c:39: if(spots[0]=='1') {
+      000053 74 31            [12]  408 	mov	a,#0x31
+      000055 B5 23 05         [24]  409 	cjne	a,_spots,00105$
+                                    410 ;	testparking.c:40: spots[0] = 'X';
+      000058 75 23 58         [24]  411 	mov	_spots,#0x58
+      00005B 80 03            [24]  412 	sjmp	00106$
+      00005D                        413 00105$:
+                                    414 ;	testparking.c:42: spots[1] = 'X';
+      00005D 75 24 58         [24]  415 	mov	(_spots + 0x0001),#0x58
+      000060                        416 00106$:
+                                    417 ;	testparking.c:44: CarOut[0] = now;
+      000060 85 3F 4A         [24]  418 	mov	_CarOut,_now
+                                    419 ;	testparking.c:45: SemaphoreSignal(spotsSync);
+      000063 05 22            [12]  420 	inc _spotsSync 
+                                    421 ;	testparking.c:46: EA=1;
+                                    422 ;	assignBit
+      000065 D2 AF            [12]  423 	setb	_EA
+                                    424 ;	testparking.c:48: SemaphoreSignal(sem);
+      000067 05 21            [12]  425 	inc _sem 
+                                    426 ;	testparking.c:50: ThreadExit();
+                                    427 ;	testparking.c:52: }
+      000069 02 04 FC         [24]  428 	ljmp	_ThreadExit
+                                    429 ;------------------------------------------------------------
+                                    430 ;Allocation info for local variables in function 'Car2'
+                                    431 ;------------------------------------------------------------
+                                    432 ;	testparking.c:54: void Car2(void){
+                                    433 ;	-----------------------------------------
+                                    434 ;	 function Car2
+                                    435 ;	-----------------------------------------
+      00006C                        436 _Car2:
+                                    437 ;	testparking.c:55: SemaphoreWait(sem);
+      00006C                        438 		3$:
+      00006C E5 21            [12]  439 	mov a, _sem 
+      00006E 60 FC            [24]  440 	jz 3$ 
+      000070 20 E7 F9         [24]  441 	jb ACC.7, 3$ 
+      000073 15 21            [12]  442 	dec _sem 
+                                    443 ;	testparking.c:57: EA=0;
+                                    444 ;	assignBit
+      000075 C2 AF            [12]  445 	clr	_EA
+                                    446 ;	testparking.c:58: SemaphoreWait(spotsSync);
+      000077                        447 		4$:
+      000077 E5 22            [12]  448 	mov a, _spotsSync 
+      000079 60 FC            [24]  449 	jz 4$ 
+      00007B 20 E7 F9         [24]  450 	jb ACC.7, 4$ 
+      00007E 15 22            [12]  451 	dec _spotsSync 
+                                    452 ;	testparking.c:59: if(spots[0]=='X') {
+      000080 74 58            [12]  453 	mov	a,#0x58
+      000082 B5 23 08         [24]  454 	cjne	a,_spots,00102$
+                                    455 ;	testparking.c:60: spots[0] = '2';
+      000085 75 23 32         [24]  456 	mov	_spots,#0x32
+                                    457 ;	testparking.c:61: CarSpot[1] = '0';
+      000088 75 5B 30         [24]  458 	mov	(_CarSpot + 0x0001),#0x30
+      00008B 80 06            [24]  459 	sjmp	00103$
+      00008D                        460 00102$:
+                                    461 ;	testparking.c:63: spots[1] = '2';
+      00008D 75 24 32         [24]  462 	mov	(_spots + 0x0001),#0x32
+                                    463 ;	testparking.c:64: CarSpot[1] = '1';
+      000090 75 5B 31         [24]  464 	mov	(_CarSpot + 0x0001),#0x31
+      000093                        465 00103$:
+                                    466 ;	testparking.c:66: CarIn[1] = now;
+      000093 85 3F 26         [24]  467 	mov	(_CarIn + 0x0001),_now
+                                    468 ;	testparking.c:67: SemaphoreSignal(spotsSync);
+      000096 05 22            [12]  469 	inc _spotsSync 
+                                    470 ;	testparking.c:68: EA=1;
+                                    471 ;	assignBit
+      000098 D2 AF            [12]  472 	setb	_EA
+                                    473 ;	testparking.c:70: delay(6);
+      00009A 75 82 06         [24]  474 	mov	dpl,#0x06
+      00009D 12 05 DC         [24]  475 	lcall	_delay
+                                    476 ;	testparking.c:72: EA=0;
+                                    477 ;	assignBit
+      0000A0 C2 AF            [12]  478 	clr	_EA
+                                    479 ;	testparking.c:73: SemaphoreWait(spotsSync);
+      0000A2                        480 		5$:
+      0000A2 E5 22            [12]  481 	mov a, _spotsSync 
+      0000A4 60 FC            [24]  482 	jz 5$ 
+      0000A6 20 E7 F9         [24]  483 	jb ACC.7, 5$ 
+      0000A9 15 22            [12]  484 	dec _spotsSync 
+                                    485 ;	testparking.c:74: if(spots[0]=='2') {
+      0000AB 74 32            [12]  486 	mov	a,#0x32
+      0000AD B5 23 05         [24]  487 	cjne	a,_spots,00105$
+                                    488 ;	testparking.c:75: spots[0] = 'X';
+      0000B0 75 23 58         [24]  489 	mov	_spots,#0x58
+      0000B3 80 03            [24]  490 	sjmp	00106$
+      0000B5                        491 00105$:
+                                    492 ;	testparking.c:77: spots[1] = 'X';
+      0000B5 75 24 58         [24]  493 	mov	(_spots + 0x0001),#0x58
+      0000B8                        494 00106$:
+                                    495 ;	testparking.c:79: CarOut[1] = now;
+      0000B8 85 3F 4B         [24]  496 	mov	(_CarOut + 0x0001),_now
+                                    497 ;	testparking.c:80: SemaphoreSignal(spotsSync);
+      0000BB 05 22            [12]  498 	inc _spotsSync 
+                                    499 ;	testparking.c:81: EA=1;
+                                    500 ;	assignBit
+      0000BD D2 AF            [12]  501 	setb	_EA
+                                    502 ;	testparking.c:83: SemaphoreSignal(sem);
+      0000BF 05 21            [12]  503 	inc _sem 
+                                    504 ;	testparking.c:85: ThreadExit();
+                                    505 ;	testparking.c:87: }
+      0000C1 02 04 FC         [24]  506 	ljmp	_ThreadExit
+                                    507 ;------------------------------------------------------------
+                                    508 ;Allocation info for local variables in function 'Car3'
+                                    509 ;------------------------------------------------------------
+                                    510 ;	testparking.c:89: void Car3(void){
+                                    511 ;	-----------------------------------------
+                                    512 ;	 function Car3
+                                    513 ;	-----------------------------------------
+      0000C4                        514 _Car3:
+                                    515 ;	testparking.c:90: SemaphoreWait(sem);
+      0000C4                        516 		6$:
+      0000C4 E5 21            [12]  517 	mov a, _sem 
+      0000C6 60 FC            [24]  518 	jz 6$ 
+      0000C8 20 E7 F9         [24]  519 	jb ACC.7, 6$ 
+      0000CB 15 21            [12]  520 	dec _sem 
+                                    521 ;	testparking.c:92: EA=0;
+                                    522 ;	assignBit
+      0000CD C2 AF            [12]  523 	clr	_EA
+                                    524 ;	testparking.c:93: SemaphoreWait(spotsSync);
+      0000CF                        525 		7$:
+      0000CF E5 22            [12]  526 	mov a, _spotsSync 
+      0000D1 60 FC            [24]  527 	jz 7$ 
+      0000D3 20 E7 F9         [24]  528 	jb ACC.7, 7$ 
+      0000D6 15 22            [12]  529 	dec _spotsSync 
+                                    530 ;	testparking.c:94: if(spots[0]=='X') {
+      0000D8 74 58            [12]  531 	mov	a,#0x58
+      0000DA B5 23 08         [24]  532 	cjne	a,_spots,00102$
+                                    533 ;	testparking.c:95: spots[0] = '3';
+      0000DD 75 23 33         [24]  534 	mov	_spots,#0x33
+                                    535 ;	testparking.c:96: CarSpot[2] = '0';
+      0000E0 75 5C 30         [24]  536 	mov	(_CarSpot + 0x0002),#0x30
+      0000E3 80 06            [24]  537 	sjmp	00103$
+      0000E5                        538 00102$:
+                                    539 ;	testparking.c:98: spots[1] = '3';
+      0000E5 75 24 33         [24]  540 	mov	(_spots + 0x0001),#0x33
+                                    541 ;	testparking.c:99: CarSpot[2] = '1';
+      0000E8 75 5C 31         [24]  542 	mov	(_CarSpot + 0x0002),#0x31
+      0000EB                        543 00103$:
+                                    544 ;	testparking.c:101: CarIn[2] = now;
+      0000EB 85 3F 27         [24]  545 	mov	(_CarIn + 0x0002),_now
+                                    546 ;	testparking.c:102: SemaphoreSignal(spotsSync);
+      0000EE 05 22            [12]  547 	inc _spotsSync 
+                                    548 ;	testparking.c:103: EA=1;
+                                    549 ;	assignBit
+      0000F0 D2 AF            [12]  550 	setb	_EA
+                                    551 ;	testparking.c:105: delay(5);
+      0000F2 75 82 05         [24]  552 	mov	dpl,#0x05
+      0000F5 12 05 DC         [24]  553 	lcall	_delay
+                                    554 ;	testparking.c:107: EA=0;
+                                    555 ;	assignBit
+      0000F8 C2 AF            [12]  556 	clr	_EA
+                                    557 ;	testparking.c:108: SemaphoreWait(spotsSync);
+      0000FA                        558 		8$:
+      0000FA E5 22            [12]  559 	mov a, _spotsSync 
+      0000FC 60 FC            [24]  560 	jz 8$ 
+      0000FE 20 E7 F9         [24]  561 	jb ACC.7, 8$ 
+      000101 15 22            [12]  562 	dec _spotsSync 
+                                    563 ;	testparking.c:109: if(spots[0]=='3') {
+      000103 74 33            [12]  564 	mov	a,#0x33
+      000105 B5 23 05         [24]  565 	cjne	a,_spots,00105$
+                                    566 ;	testparking.c:110: spots[0] = 'X';
+      000108 75 23 58         [24]  567 	mov	_spots,#0x58
+      00010B 80 03            [24]  568 	sjmp	00106$
+      00010D                        569 00105$:
+                                    570 ;	testparking.c:112: spots[1] = 'X';
+      00010D 75 24 58         [24]  571 	mov	(_spots + 0x0001),#0x58
+      000110                        572 00106$:
+                                    573 ;	testparking.c:114: CarOut[2] = now;
+      000110 85 3F 4C         [24]  574 	mov	(_CarOut + 0x0002),_now
+                                    575 ;	testparking.c:115: SemaphoreSignal(spotsSync);
+      000113 05 22            [12]  576 	inc _spotsSync 
+                                    577 ;	testparking.c:116: EA=1;
+                                    578 ;	assignBit
+      000115 D2 AF            [12]  579 	setb	_EA
+                                    580 ;	testparking.c:118: SemaphoreSignal(sem);
+      000117 05 21            [12]  581 	inc _sem 
+                                    582 ;	testparking.c:120: ThreadExit();
+                                    583 ;	testparking.c:122: }
+      000119 02 04 FC         [24]  584 	ljmp	_ThreadExit
+                                    585 ;------------------------------------------------------------
+                                    586 ;Allocation info for local variables in function 'Car4'
+                                    587 ;------------------------------------------------------------
+                                    588 ;	testparking.c:124: void Car4(void){
+                                    589 ;	-----------------------------------------
+                                    590 ;	 function Car4
+                                    591 ;	-----------------------------------------
+      00011C                        592 _Car4:
+                                    593 ;	testparking.c:125: SemaphoreWait(sem);
+      00011C                        594 		9$:
+      00011C E5 21            [12]  595 	mov a, _sem 
+      00011E 60 FC            [24]  596 	jz 9$ 
+      000120 20 E7 F9         [24]  597 	jb ACC.7, 9$ 
+      000123 15 21            [12]  598 	dec _sem 
+                                    599 ;	testparking.c:127: EA=0;
+                                    600 ;	assignBit
+      000125 C2 AF            [12]  601 	clr	_EA
+                                    602 ;	testparking.c:128: SemaphoreWait(spotsSync);
+      000127                        603 		10$:
+      000127 E5 22            [12]  604 	mov a, _spotsSync 
+      000129 60 FC            [24]  605 	jz 10$ 
+      00012B 20 E7 F9         [24]  606 	jb ACC.7, 10$ 
+      00012E 15 22            [12]  607 	dec _spotsSync 
+                                    608 ;	testparking.c:129: if(spots[0]=='X') {
+      000130 74 58            [12]  609 	mov	a,#0x58
+      000132 B5 23 08         [24]  610 	cjne	a,_spots,00102$
+                                    611 ;	testparking.c:130: spots[0] = '4';
+      000135 75 23 34         [24]  612 	mov	_spots,#0x34
+                                    613 ;	testparking.c:131: CarSpot[3] = '0';
+      000138 75 5D 30         [24]  614 	mov	(_CarSpot + 0x0003),#0x30
+      00013B 80 06            [24]  615 	sjmp	00103$
+      00013D                        616 00102$:
+                                    617 ;	testparking.c:133: spots[1] = '4';
+      00013D 75 24 34         [24]  618 	mov	(_spots + 0x0001),#0x34
+                                    619 ;	testparking.c:134: CarSpot[3] = '1';
+      000140 75 5D 31         [24]  620 	mov	(_CarSpot + 0x0003),#0x31
+      000143                        621 00103$:
+                                    622 ;	testparking.c:136: CarIn[3] = now;
+      000143 85 3F 28         [24]  623 	mov	(_CarIn + 0x0003),_now
+                                    624 ;	testparking.c:137: SemaphoreSignal(spotsSync);
+      000146 05 22            [12]  625 	inc _spotsSync 
+                                    626 ;	testparking.c:138: EA=1;
+                                    627 ;	assignBit
+      000148 D2 AF            [12]  628 	setb	_EA
+                                    629 ;	testparking.c:140: delay(7);
+      00014A 75 82 07         [24]  630 	mov	dpl,#0x07
+      00014D 12 05 DC         [24]  631 	lcall	_delay
+                                    632 ;	testparking.c:142: EA=0;
+                                    633 ;	assignBit
+      000150 C2 AF            [12]  634 	clr	_EA
+                                    635 ;	testparking.c:143: SemaphoreWait(spotsSync);
+      000152                        636 		11$:
+      000152 E5 22            [12]  637 	mov a, _spotsSync 
+      000154 60 FC            [24]  638 	jz 11$ 
+      000156 20 E7 F9         [24]  639 	jb ACC.7, 11$ 
+      000159 15 22            [12]  640 	dec _spotsSync 
+                                    641 ;	testparking.c:144: if(spots[0]=='4') {
+      00015B 74 34            [12]  642 	mov	a,#0x34
+      00015D B5 23 05         [24]  643 	cjne	a,_spots,00105$
+                                    644 ;	testparking.c:145: spots[0] = 'X';
+      000160 75 23 58         [24]  645 	mov	_spots,#0x58
+      000163 80 03            [24]  646 	sjmp	00106$
+      000165                        647 00105$:
+                                    648 ;	testparking.c:147: spots[1] = 'X';
+      000165 75 24 58         [24]  649 	mov	(_spots + 0x0001),#0x58
+      000168                        650 00106$:
+                                    651 ;	testparking.c:149: CarOut[3] = now;
+      000168 85 3F 4D         [24]  652 	mov	(_CarOut + 0x0003),_now
+                                    653 ;	testparking.c:150: SemaphoreSignal(spotsSync);
+      00016B 05 22            [12]  654 	inc _spotsSync 
+                                    655 ;	testparking.c:151: EA=1;
+                                    656 ;	assignBit
+      00016D D2 AF            [12]  657 	setb	_EA
+                                    658 ;	testparking.c:153: SemaphoreSignal(sem);
+      00016F 05 21            [12]  659 	inc _sem 
+                                    660 ;	testparking.c:155: ThreadExit();
+                                    661 ;	testparking.c:157: }
+      000171 02 04 FC         [24]  662 	ljmp	_ThreadExit
+                                    663 ;------------------------------------------------------------
+                                    664 ;Allocation info for local variables in function 'Car5'
+                                    665 ;------------------------------------------------------------
+                                    666 ;	testparking.c:159: void Car5(void){
+                                    667 ;	-----------------------------------------
+                                    668 ;	 function Car5
+                                    669 ;	-----------------------------------------
+      000174                        670 _Car5:
+                                    671 ;	testparking.c:160: SemaphoreWait(sem);
+      000174                        672 		12$:
+      000174 E5 21            [12]  673 	mov a, _sem 
+      000176 60 FC            [24]  674 	jz 12$ 
+      000178 20 E7 F9         [24]  675 	jb ACC.7, 12$ 
+      00017B 15 21            [12]  676 	dec _sem 
+                                    677 ;	testparking.c:162: EA=0;
+                                    678 ;	assignBit
+      00017D C2 AF            [12]  679 	clr	_EA
+                                    680 ;	testparking.c:163: SemaphoreWait(spotsSync);
+      00017F                        681 		13$:
+      00017F E5 22            [12]  682 	mov a, _spotsSync 
+      000181 60 FC            [24]  683 	jz 13$ 
+      000183 20 E7 F9         [24]  684 	jb ACC.7, 13$ 
+      000186 15 22            [12]  685 	dec _spotsSync 
+                                    686 ;	testparking.c:164: if(spots[0]=='X') {
+      000188 74 58            [12]  687 	mov	a,#0x58
+      00018A B5 23 08         [24]  688 	cjne	a,_spots,00102$
+                                    689 ;	testparking.c:165: spots[0] = '5';
+      00018D 75 23 35         [24]  690 	mov	_spots,#0x35
+                                    691 ;	testparking.c:166: CarSpot[4] = '0';
+      000190 75 5E 30         [24]  692 	mov	(_CarSpot + 0x0004),#0x30
+      000193 80 06            [24]  693 	sjmp	00103$
+      000195                        694 00102$:
+                                    695 ;	testparking.c:168: spots[1] = '5';
+      000195 75 24 35         [24]  696 	mov	(_spots + 0x0001),#0x35
+                                    697 ;	testparking.c:169: CarSpot[4] = '1';
+      000198 75 5E 31         [24]  698 	mov	(_CarSpot + 0x0004),#0x31
+      00019B                        699 00103$:
+                                    700 ;	testparking.c:171: CarIn[4] = now;
+      00019B 85 3F 29         [24]  701 	mov	(_CarIn + 0x0004),_now
+                                    702 ;	testparking.c:172: SemaphoreSignal(spotsSync);
+      00019E 05 22            [12]  703 	inc _spotsSync 
+                                    704 ;	testparking.c:173: EA=1;
+                                    705 ;	assignBit
+      0001A0 D2 AF            [12]  706 	setb	_EA
+                                    707 ;	testparking.c:175: delay(3);
+      0001A2 75 82 03         [24]  708 	mov	dpl,#0x03
+      0001A5 12 05 DC         [24]  709 	lcall	_delay
+                                    710 ;	testparking.c:177: EA=0;
+                                    711 ;	assignBit
+      0001A8 C2 AF            [12]  712 	clr	_EA
+                                    713 ;	testparking.c:178: SemaphoreWait(spotsSync);
+      0001AA                        714 		14$:
+      0001AA E5 22            [12]  715 	mov a, _spotsSync 
+      0001AC 60 FC            [24]  716 	jz 14$ 
+      0001AE 20 E7 F9         [24]  717 	jb ACC.7, 14$ 
+      0001B1 15 22            [12]  718 	dec _spotsSync 
+                                    719 ;	testparking.c:179: if(spots[0]=='5') {
+      0001B3 74 35            [12]  720 	mov	a,#0x35
+      0001B5 B5 23 05         [24]  721 	cjne	a,_spots,00105$
+                                    722 ;	testparking.c:180: spots[0] = 'X';
+      0001B8 75 23 58         [24]  723 	mov	_spots,#0x58
+      0001BB 80 03            [24]  724 	sjmp	00106$
+      0001BD                        725 00105$:
+                                    726 ;	testparking.c:182: spots[1] = 'X';
+      0001BD 75 24 58         [24]  727 	mov	(_spots + 0x0001),#0x58
+      0001C0                        728 00106$:
+                                    729 ;	testparking.c:184: CarOut[4] = now;
+      0001C0 85 3F 4E         [24]  730 	mov	(_CarOut + 0x0004),_now
+                                    731 ;	testparking.c:185: SemaphoreSignal(spotsSync);
+      0001C3 05 22            [12]  732 	inc _spotsSync 
+                                    733 ;	testparking.c:186: EA=1;
+                                    734 ;	assignBit
+      0001C5 D2 AF            [12]  735 	setb	_EA
+                                    736 ;	testparking.c:188: SemaphoreSignal(sem);
+      0001C7 05 21            [12]  737 	inc _sem 
+                                    738 ;	testparking.c:190: ThreadExit();
+                                    739 ;	testparking.c:192: }
+      0001C9 02 04 FC         [24]  740 	ljmp	_ThreadExit
+                                    741 ;------------------------------------------------------------
+                                    742 ;Allocation info for local variables in function 'Consumer'
+                                    743 ;------------------------------------------------------------
+                                    744 ;i                         Allocated to registers r7 
+                                    745 ;j                         Allocated to registers r6 
+                                    746 ;j                         Allocated to registers r6 
+                                    747 ;j                         Allocated to registers r6 
+                                    748 ;j                         Allocated to registers r6 
+                                    749 ;j                         Allocated to registers r6 
+                                    750 ;j                         Allocated to registers r6 
+                                    751 ;j                         Allocated to registers r6 
+                                    752 ;------------------------------------------------------------
+                                    753 ;	testparking.c:194: void Consumer(void) {
+                                    754 ;	-----------------------------------------
+                                    755 ;	 function Consumer
+                                    756 ;	-----------------------------------------
+      0001CC                        757 _Consumer:
+                                    758 ;	testparking.c:195: TMOD |= 0x20;
+      0001CC 43 89 20         [24]  759 	orl	_TMOD,#0x20
+                                    760 ;	testparking.c:196: TH1 = -6;
+      0001CF 75 8D FA         [24]  761 	mov	_TH1,#0xfa
+                                    762 ;	testparking.c:197: SCON = 0x50;
+      0001D2 75 98 50         [24]  763 	mov	_SCON,#0x50
+                                    764 ;	testparking.c:198: TR1 = 1;
+                                    765 ;	assignBit
+      0001D5 D2 8E            [12]  766 	setb	_TR1
+                                    767 ;	testparking.c:199: EA = 0;
+                                    768 ;	assignBit
+      0001D7 C2 AF            [12]  769 	clr	_EA
+                                    770 ;	testparking.c:200: for(char i=0; i<5; i++){
+      0001D9 7F 00            [12]  771 	mov	r7,#0x00
+      0001DB                        772 00180$:
+      0001DB BF 05 00         [24]  773 	cjne	r7,#0x05,00384$
+      0001DE                        774 00384$:
+      0001DE 40 03            [24]  775 	jc	00385$
+      0001E0 02 03 58         [24]  776 	ljmp	00157$
+      0001E3                        777 00385$:
+                                    778 ;	testparking.c:201: for(char j=0; j<5; j++) {
+      0001E3 7E 00            [12]  779 	mov	r6,#0x00
+      0001E5                        780 00159$:
+      0001E5 BE 05 00         [24]  781 	cjne	r6,#0x05,00386$
+      0001E8                        782 00386$:
+      0001E8 50 11            [24]  783 	jnc	00104$
+                                    784 ;	testparking.c:202: SBUF = Car[j];
+      0001EA 8E 82            [24]  785 	mov	dpl,r6
+      0001EC 75 83 07         [24]  786 	mov	dph,#(_Car >> 8)
+      0001EF E4               [12]  787 	clr	a
+      0001F0 93               [24]  788 	movc	a,@a+dptr
+      0001F1 F5 99            [12]  789 	mov	_SBUF,a
+                                    790 ;	testparking.c:203: while(!TI);
+      0001F3                        791 00101$:
+                                    792 ;	testparking.c:204: TI = 0;
+                                    793 ;	assignBit
+      0001F3 10 99 02         [24]  794 	jbc	_TI,00388$
+      0001F6 80 FB            [24]  795 	sjmp	00101$
+      0001F8                        796 00388$:
+                                    797 ;	testparking.c:201: for(char j=0; j<5; j++) {
+      0001F8 0E               [12]  798 	inc	r6
+      0001F9 80 EA            [24]  799 	sjmp	00159$
+      0001FB                        800 00104$:
+                                    801 ;	testparking.c:207: SBUF = '1' + i;
+      0001FB 8F 06            [24]  802 	mov	ar6,r7
+      0001FD 74 31            [12]  803 	mov	a,#0x31
+      0001FF 2E               [12]  804 	add	a,r6
+      000200 F5 99            [12]  805 	mov	_SBUF,a
+                                    806 ;	testparking.c:208: while(!TI);
+      000202                        807 00105$:
+                                    808 ;	testparking.c:209: TI = 0;
+                                    809 ;	assignBit
+      000202 10 99 02         [24]  810 	jbc	_TI,00389$
+      000205 80 FB            [24]  811 	sjmp	00105$
+      000207                        812 00389$:
+                                    813 ;	testparking.c:211: for(char j=0; j<11; j++) {
+      000207 7E 00            [12]  814 	mov	r6,#0x00
+      000209                        815 00162$:
+      000209 BE 0B 00         [24]  816 	cjne	r6,#0x0b,00390$
+      00020C                        817 00390$:
+      00020C 50 0F            [24]  818 	jnc	00111$
+                                    819 ;	testparking.c:212: SBUF = GotSpot[j];
+      00020E EE               [12]  820 	mov	a,r6
+      00020F 90 07 10         [24]  821 	mov	dptr,#_GotSpot
+      000212 93               [24]  822 	movc	a,@a+dptr
+      000213 F5 99            [12]  823 	mov	_SBUF,a
+                                    824 ;	testparking.c:213: while(!TI);
+      000215                        825 00108$:
+                                    826 ;	testparking.c:214: TI = 0;
+                                    827 ;	assignBit
+      000215 10 99 02         [24]  828 	jbc	_TI,00392$
+      000218 80 FB            [24]  829 	sjmp	00108$
+      00021A                        830 00392$:
+                                    831 ;	testparking.c:211: for(char j=0; j<11; j++) {
+      00021A 0E               [12]  832 	inc	r6
+      00021B 80 EC            [24]  833 	sjmp	00162$
+      00021D                        834 00111$:
+                                    835 ;	testparking.c:217: SBUF = CarSpot[i];
+      00021D EF               [12]  836 	mov	a,r7
+      00021E 24 5A            [12]  837 	add	a,#_CarSpot
+      000220 F9               [12]  838 	mov	r1,a
+      000221 87 99            [24]  839 	mov	_SBUF,@r1
+                                    840 ;	testparking.c:218: while(!TI);
+      000223                        841 00112$:
+                                    842 ;	testparking.c:219: TI = 0;
+                                    843 ;	assignBit
+      000223 10 99 02         [24]  844 	jbc	_TI,00393$
+      000226 80 FB            [24]  845 	sjmp	00112$
+      000228                        846 00393$:
+                                    847 ;	testparking.c:221: for(char j=0; j<16; j++) {
+      000228 7E 00            [12]  848 	mov	r6,#0x00
+      00022A                        849 00165$:
+      00022A BE 10 00         [24]  850 	cjne	r6,#0x10,00394$
+      00022D                        851 00394$:
+      00022D 50 0F            [24]  852 	jnc	00118$
+                                    853 ;	testparking.c:222: SBUF = TimeUnit[j];
+      00022F EE               [12]  854 	mov	a,r6
+      000230 90 07 30         [24]  855 	mov	dptr,#_TimeUnit
+      000233 93               [24]  856 	movc	a,@a+dptr
+      000234 F5 99            [12]  857 	mov	_SBUF,a
+                                    858 ;	testparking.c:223: while(!TI);
+      000236                        859 00115$:
+                                    860 ;	testparking.c:224: TI = 0;
+                                    861 ;	assignBit
+      000236 10 99 02         [24]  862 	jbc	_TI,00396$
+      000239 80 FB            [24]  863 	sjmp	00115$
+      00023B                        864 00396$:
+                                    865 ;	testparking.c:221: for(char j=0; j<16; j++) {
+      00023B 0E               [12]  866 	inc	r6
+      00023C 80 EC            [24]  867 	sjmp	00165$
+      00023E                        868 00118$:
+                                    869 ;	testparking.c:227: if(CarIn[i]>9) {
+      00023E EF               [12]  870 	mov	a,r7
+      00023F 24 25            [12]  871 	add	a,#_CarIn
+      000241 F9               [12]  872 	mov	r1,a
+      000242 E7               [12]  873 	mov	a,@r1
+      000243 24 F6            [12]  874 	add	a,#0xff - 0x09
+      000245 50 26            [24]  875 	jnc	00123$
+                                    876 ;	testparking.c:228: SBUF = '0' + (CarIn[i]/10);
+      000247 EF               [12]  877 	mov	a,r7
+      000248 24 25            [12]  878 	add	a,#_CarIn
+      00024A F9               [12]  879 	mov	r1,a
+      00024B 87 06            [24]  880 	mov	ar6,@r1
+      00024D 7D 00            [12]  881 	mov	r5,#0x00
+      00024F 75 08 0A         [24]  882 	mov	__divsint_PARM_2,#0x0a
+                                    883 ;	1-genFromRTrack replaced	mov	(__divsint_PARM_2 + 1),#0x00
+      000252 8D 09            [24]  884 	mov	(__divsint_PARM_2 + 1),r5
+      000254 8E 82            [24]  885 	mov	dpl,r6
+      000256 8D 83            [24]  886 	mov	dph,r5
+      000258 C0 07            [24]  887 	push	ar7
+      00025A 12 06 A4         [24]  888 	lcall	__divsint
+      00025D AD 82            [24]  889 	mov	r5,dpl
+      00025F AE 83            [24]  890 	mov	r6,dph
+      000261 D0 07            [24]  891 	pop	ar7
+      000263 74 30            [12]  892 	mov	a,#0x30
+      000265 2D               [12]  893 	add	a,r5
+      000266 F5 99            [12]  894 	mov	_SBUF,a
+                                    895 ;	testparking.c:229: while(!TI);
+      000268                        896 00119$:
+                                    897 ;	testparking.c:230: TI = 0;
+                                    898 ;	assignBit
+      000268 10 99 02         [24]  899 	jbc	_TI,00398$
+      00026B 80 FB            [24]  900 	sjmp	00119$
+      00026D                        901 00398$:
+      00026D                        902 00123$:
+                                    903 ;	testparking.c:233: SBUF = '0' + (CarIn[i]%10);
+      00026D EF               [12]  904 	mov	a,r7
+      00026E 24 25            [12]  905 	add	a,#_CarIn
+      000270 F9               [12]  906 	mov	r1,a
+      000271 87 06            [24]  907 	mov	ar6,@r1
+      000273 7D 00            [12]  908 	mov	r5,#0x00
+      000275 75 08 0A         [24]  909 	mov	__modsint_PARM_2,#0x0a
+                                    910 ;	1-genFromRTrack replaced	mov	(__modsint_PARM_2 + 1),#0x00
+      000278 8D 09            [24]  911 	mov	(__modsint_PARM_2 + 1),r5
+      00027A 8E 82            [24]  912 	mov	dpl,r6
+      00027C 8D 83            [24]  913 	mov	dph,r5
+      00027E C0 07            [24]  914 	push	ar7
+      000280 12 06 6E         [24]  915 	lcall	__modsint
+      000283 AD 82            [24]  916 	mov	r5,dpl
+      000285 D0 07            [24]  917 	pop	ar7
+      000287 74 30            [12]  918 	mov	a,#0x30
+      000289 2D               [12]  919 	add	a,r5
+      00028A F5 99            [12]  920 	mov	_SBUF,a
+                                    921 ;	testparking.c:234: while(!TI);
+      00028C                        922 00124$:
+                                    923 ;	testparking.c:235: TI = 0;
+                                    924 ;	assignBit
+      00028C 10 99 02         [24]  925 	jbc	_TI,00399$
+      00028F 80 FB            [24]  926 	sjmp	00124$
+      000291                        927 00399$:
+                                    928 ;	testparking.c:237: for(char j=0; j<5; j++) {
+      000291 7E 00            [12]  929 	mov	r6,#0x00
+      000293                        930 00168$:
+      000293 BE 05 00         [24]  931 	cjne	r6,#0x05,00400$
+      000296                        932 00400$:
+      000296 50 0F            [24]  933 	jnc	00130$
+                                    934 ;	testparking.c:238: SBUF = and[j];
+      000298 EE               [12]  935 	mov	a,r6
+      000299 90 07 20         [24]  936 	mov	dptr,#_and
+      00029C 93               [24]  937 	movc	a,@a+dptr
+      00029D F5 99            [12]  938 	mov	_SBUF,a
+                                    939 ;	testparking.c:239: while(!TI);
+      00029F                        940 00127$:
+                                    941 ;	testparking.c:240: TI = 0;
+                                    942 ;	assignBit
+      00029F 10 99 02         [24]  943 	jbc	_TI,00402$
+      0002A2 80 FB            [24]  944 	sjmp	00127$
+      0002A4                        945 00402$:
+                                    946 ;	testparking.c:237: for(char j=0; j<5; j++) {
+      0002A4 0E               [12]  947 	inc	r6
+      0002A5 80 EC            [24]  948 	sjmp	00168$
+      0002A7                        949 00130$:
+                                    950 ;	testparking.c:244: for(char j=0; j<5; j++) {
+      0002A7 7E 00            [12]  951 	mov	r6,#0x00
+      0002A9                        952 00171$:
+      0002A9 BE 05 00         [24]  953 	cjne	r6,#0x05,00403$
+      0002AC                        954 00403$:
+      0002AC 50 11            [24]  955 	jnc	00134$
+                                    956 ;	testparking.c:245: SBUF = Car[j];
+      0002AE 8E 82            [24]  957 	mov	dpl,r6
+      0002B0 75 83 07         [24]  958 	mov	dph,#(_Car >> 8)
+      0002B3 E4               [12]  959 	clr	a
+      0002B4 93               [24]  960 	movc	a,@a+dptr
+      0002B5 F5 99            [12]  961 	mov	_SBUF,a
+                                    962 ;	testparking.c:246: while(!TI);
+      0002B7                        963 00131$:
+                                    964 ;	testparking.c:247: TI = 0;
+                                    965 ;	assignBit
+      0002B7 10 99 02         [24]  966 	jbc	_TI,00405$
+      0002BA 80 FB            [24]  967 	sjmp	00131$
+      0002BC                        968 00405$:
+                                    969 ;	testparking.c:244: for(char j=0; j<5; j++) {
+      0002BC 0E               [12]  970 	inc	r6
+      0002BD 80 EA            [24]  971 	sjmp	00171$
+      0002BF                        972 00134$:
+                                    973 ;	testparking.c:250: SBUF = '1' + i;
+      0002BF 8F 06            [24]  974 	mov	ar6,r7
+      0002C1 74 31            [12]  975 	mov	a,#0x31
+      0002C3 2E               [12]  976 	add	a,r6
+      0002C4 F5 99            [12]  977 	mov	_SBUF,a
+                                    978 ;	testparking.c:251: while(!TI);
+      0002C6                        979 00135$:
+                                    980 ;	testparking.c:252: TI = 0;
+                                    981 ;	assignBit
+      0002C6 10 99 02         [24]  982 	jbc	_TI,00406$
+      0002C9 80 FB            [24]  983 	sjmp	00135$
+      0002CB                        984 00406$:
+                                    985 ;	testparking.c:254: for(char j=0; j<7; j++) {
+      0002CB 7E 00            [12]  986 	mov	r6,#0x00
+      0002CD                        987 00174$:
+      0002CD BE 07 00         [24]  988 	cjne	r6,#0x07,00407$
+      0002D0                        989 00407$:
+      0002D0 50 0F            [24]  990 	jnc	00141$
+                                    991 ;	testparking.c:255: SBUF = ExitSpot[j];
+      0002D2 EE               [12]  992 	mov	a,r6
+      0002D3 90 07 40         [24]  993 	mov	dptr,#_ExitSpot
+      0002D6 93               [24]  994 	movc	a,@a+dptr
+      0002D7 F5 99            [12]  995 	mov	_SBUF,a
+                                    996 ;	testparking.c:256: while(!TI);
+      0002D9                        997 00138$:
+                                    998 ;	testparking.c:257: TI = 0;
+                                    999 ;	assignBit
+      0002D9 10 99 02         [24] 1000 	jbc	_TI,00409$
+      0002DC 80 FB            [24] 1001 	sjmp	00138$
+      0002DE                       1002 00409$:
+                                   1003 ;	testparking.c:254: for(char j=0; j<7; j++) {
+      0002DE 0E               [12] 1004 	inc	r6
+      0002DF 80 EC            [24] 1005 	sjmp	00174$
+      0002E1                       1006 00141$:
+                                   1007 ;	testparking.c:260: for(char j=0; j<16; j++) {
+      0002E1 7E 00            [12] 1008 	mov	r6,#0x00
+      0002E3                       1009 00177$:
+      0002E3 BE 10 00         [24] 1010 	cjne	r6,#0x10,00410$
+      0002E6                       1011 00410$:
+      0002E6 50 0F            [24] 1012 	jnc	00145$
+                                   1013 ;	testparking.c:261: SBUF = TimeUnit[j];
+      0002E8 EE               [12] 1014 	mov	a,r6
+      0002E9 90 07 30         [24] 1015 	mov	dptr,#_TimeUnit
+      0002EC 93               [24] 1016 	movc	a,@a+dptr
+      0002ED F5 99            [12] 1017 	mov	_SBUF,a
+                                   1018 ;	testparking.c:262: while(!TI);
+      0002EF                       1019 00142$:
+                                   1020 ;	testparking.c:263: TI = 0;
+                                   1021 ;	assignBit
+      0002EF 10 99 02         [24] 1022 	jbc	_TI,00412$
+      0002F2 80 FB            [24] 1023 	sjmp	00142$
+      0002F4                       1024 00412$:
+                                   1025 ;	testparking.c:260: for(char j=0; j<16; j++) {
+      0002F4 0E               [12] 1026 	inc	r6
+      0002F5 80 EC            [24] 1027 	sjmp	00177$
+      0002F7                       1028 00145$:
+                                   1029 ;	testparking.c:266: if(CarOut[i]>9) {
+      0002F7 EF               [12] 1030 	mov	a,r7
+      0002F8 24 4A            [12] 1031 	add	a,#_CarOut
+      0002FA F9               [12] 1032 	mov	r1,a
+      0002FB E7               [12] 1033 	mov	a,@r1
+      0002FC 24 F6            [12] 1034 	add	a,#0xff - 0x09
+      0002FE 50 26            [24] 1035 	jnc	00150$
+                                   1036 ;	testparking.c:267: SBUF = '0' + (CarOut[i]/10);
+      000300 EF               [12] 1037 	mov	a,r7
+      000301 24 4A            [12] 1038 	add	a,#_CarOut
+      000303 F9               [12] 1039 	mov	r1,a
+      000304 87 06            [24] 1040 	mov	ar6,@r1
+      000306 7D 00            [12] 1041 	mov	r5,#0x00
+      000308 75 08 0A         [24] 1042 	mov	__divsint_PARM_2,#0x0a
+                                   1043 ;	1-genFromRTrack replaced	mov	(__divsint_PARM_2 + 1),#0x00
+      00030B 8D 09            [24] 1044 	mov	(__divsint_PARM_2 + 1),r5
+      00030D 8E 82            [24] 1045 	mov	dpl,r6
+      00030F 8D 83            [24] 1046 	mov	dph,r5
+      000311 C0 07            [24] 1047 	push	ar7
+      000313 12 06 A4         [24] 1048 	lcall	__divsint
+      000316 AD 82            [24] 1049 	mov	r5,dpl
+      000318 AE 83            [24] 1050 	mov	r6,dph
+      00031A D0 07            [24] 1051 	pop	ar7
+      00031C 74 30            [12] 1052 	mov	a,#0x30
+      00031E 2D               [12] 1053 	add	a,r5
+      00031F F5 99            [12] 1054 	mov	_SBUF,a
+                                   1055 ;	testparking.c:268: while(!TI);
+      000321                       1056 00146$:
+                                   1057 ;	testparking.c:269: TI = 0;
+                                   1058 ;	assignBit
+      000321 10 99 02         [24] 1059 	jbc	_TI,00414$
+      000324 80 FB            [24] 1060 	sjmp	00146$
+      000326                       1061 00414$:
+      000326                       1062 00150$:
+                                   1063 ;	testparking.c:271: SBUF = '0' + (CarOut[i]%10);
+      000326 EF               [12] 1064 	mov	a,r7
+      000327 24 4A            [12] 1065 	add	a,#_CarOut
+      000329 F9               [12] 1066 	mov	r1,a
+      00032A 87 06            [24] 1067 	mov	ar6,@r1
+      00032C 7D 00            [12] 1068 	mov	r5,#0x00
+      00032E 75 08 0A         [24] 1069 	mov	__modsint_PARM_2,#0x0a
+                                   1070 ;	1-genFromRTrack replaced	mov	(__modsint_PARM_2 + 1),#0x00
+      000331 8D 09            [24] 1071 	mov	(__modsint_PARM_2 + 1),r5
+      000333 8E 82            [24] 1072 	mov	dpl,r6
+      000335 8D 83            [24] 1073 	mov	dph,r5
+      000337 C0 07            [24] 1074 	push	ar7
+      000339 12 06 6E         [24] 1075 	lcall	__modsint
+      00033C AD 82            [24] 1076 	mov	r5,dpl
+      00033E AE 83            [24] 1077 	mov	r6,dph
+      000340 D0 07            [24] 1078 	pop	ar7
+      000342 74 30            [12] 1079 	mov	a,#0x30
+      000344 2D               [12] 1080 	add	a,r5
+      000345 F5 99            [12] 1081 	mov	_SBUF,a
+                                   1082 ;	testparking.c:272: while(!TI);
+      000347                       1083 00151$:
+                                   1084 ;	testparking.c:273: TI = 0;
+                                   1085 ;	assignBit
+      000347 10 99 02         [24] 1086 	jbc	_TI,00415$
+      00034A 80 FB            [24] 1087 	sjmp	00151$
+      00034C                       1088 00415$:
+                                   1089 ;	testparking.c:275: SBUF = '\n';
+      00034C 75 99 0A         [24] 1090 	mov	_SBUF,#0x0a
+                                   1091 ;	testparking.c:276: while(!TI);
+      00034F                       1092 00154$:
+                                   1093 ;	testparking.c:277: TI = 0;
+                                   1094 ;	assignBit
+      00034F 10 99 02         [24] 1095 	jbc	_TI,00416$
+      000352 80 FB            [24] 1096 	sjmp	00154$
+      000354                       1097 00416$:
+                                   1098 ;	testparking.c:200: for(char i=0; i<5; i++){
+      000354 0F               [12] 1099 	inc	r7
+      000355 02 01 DB         [24] 1100 	ljmp	00180$
+      000358                       1101 00157$:
+                                   1102 ;	testparking.c:280: EA = 1;
+                                   1103 ;	assignBit
+      000358 D2 AF            [12] 1104 	setb	_EA
+                                   1105 ;	testparking.c:281: }
+      00035A 22               [24] 1106 	ret
+                                   1107 ;------------------------------------------------------------
+                                   1108 ;Allocation info for local variables in function 'main'
+                                   1109 ;------------------------------------------------------------
+                                   1110 ;	testparking.c:283: void main(void) {
+                                   1111 ;	-----------------------------------------
+                                   1112 ;	 function main
+                                   1113 ;	-----------------------------------------
+      00035B                       1114 _main:
+                                   1115 ;	testparking.c:284: EA=0;
+                                   1116 ;	assignBit
+      00035B C2 AF            [12] 1117 	clr	_EA
+                                   1118 ;	testparking.c:285: spots[0] = spots[1] = 'X';
+      00035D 75 24 58         [24] 1119 	mov	(_spots + 0x0001),#0x58
+      000360 75 23 58         [24] 1120 	mov	_spots,#0x58
+                                   1121 ;	testparking.c:286: SemaphoreCreate(sem,2);
+      000363 75 21 02         [24] 1122 	mov	_sem,#0x02
+                                   1123 ;	testparking.c:287: SemaphoreCreate(spotsSync,1);
+      000366 75 22 01         [24] 1124 	mov	_spotsSync,#0x01
+                                   1125 ;	testparking.c:288: EA=1;
+                                   1126 ;	assignBit
+      000369 D2 AF            [12] 1127 	setb	_EA
+                                   1128 ;	testparking.c:290: ThreadCreate(Car1);
+      00036B 90 00 14         [24] 1129 	mov	dptr,#_Car1
+      00036E 12 04 22         [24] 1130 	lcall	_ThreadCreate
+                                   1131 ;	testparking.c:291: do{ delay(2); } while(bitmap==0x0F);
+      000371                       1132 00101$:
+      000371 75 82 02         [24] 1133 	mov	dpl,#0x02
+      000374 12 05 DC         [24] 1134 	lcall	_delay
+      000377 74 0F            [12] 1135 	mov	a,#0x0f
+      000379 B5 35 02         [24] 1136 	cjne	a,_bitmap,00163$
+      00037C 80 F3            [24] 1137 	sjmp	00101$
+      00037E                       1138 00163$:
+                                   1139 ;	testparking.c:292: ThreadCreate(Car2);
+      00037E 90 00 6C         [24] 1140 	mov	dptr,#_Car2
+      000381 12 04 22         [24] 1141 	lcall	_ThreadCreate
+                                   1142 ;	testparking.c:293: do{ delay(2); } while(bitmap==0x0F);
+      000384                       1143 00104$:
+      000384 75 82 02         [24] 1144 	mov	dpl,#0x02
+      000387 12 05 DC         [24] 1145 	lcall	_delay
+      00038A 74 0F            [12] 1146 	mov	a,#0x0f
+      00038C B5 35 02         [24] 1147 	cjne	a,_bitmap,00164$
+      00038F 80 F3            [24] 1148 	sjmp	00104$
+      000391                       1149 00164$:
+                                   1150 ;	testparking.c:294: ThreadCreate(Car3);
+      000391 90 00 C4         [24] 1151 	mov	dptr,#_Car3
+      000394 12 04 22         [24] 1152 	lcall	_ThreadCreate
+                                   1153 ;	testparking.c:295: do{ delay(2); } while(bitmap==0x0F);
+      000397                       1154 00107$:
+      000397 75 82 02         [24] 1155 	mov	dpl,#0x02
+      00039A 12 05 DC         [24] 1156 	lcall	_delay
+      00039D 74 0F            [12] 1157 	mov	a,#0x0f
+      00039F B5 35 02         [24] 1158 	cjne	a,_bitmap,00165$
+      0003A2 80 F3            [24] 1159 	sjmp	00107$
+      0003A4                       1160 00165$:
+                                   1161 ;	testparking.c:296: ThreadCreate(Car4);
+      0003A4 90 01 1C         [24] 1162 	mov	dptr,#_Car4
+      0003A7 12 04 22         [24] 1163 	lcall	_ThreadCreate
+                                   1164 ;	testparking.c:297: do{ delay(2); } while(bitmap==0x0F);
+      0003AA                       1165 00110$:
+      0003AA 75 82 02         [24] 1166 	mov	dpl,#0x02
+      0003AD 12 05 DC         [24] 1167 	lcall	_delay
+      0003B0 74 0F            [12] 1168 	mov	a,#0x0f
+      0003B2 B5 35 02         [24] 1169 	cjne	a,_bitmap,00166$
+      0003B5 80 F3            [24] 1170 	sjmp	00110$
+      0003B7                       1171 00166$:
+                                   1172 ;	testparking.c:298: ThreadCreate(Car5);
+      0003B7 90 01 74         [24] 1173 	mov	dptr,#_Car5
+      0003BA 12 04 22         [24] 1174 	lcall	_ThreadCreate
+                                   1175 ;	testparking.c:299: do{ delay(2); } while(spots[0] != 'X' || spots[1] != 'X');
+      0003BD                       1176 00114$:
+      0003BD 75 82 02         [24] 1177 	mov	dpl,#0x02
+      0003C0 12 05 DC         [24] 1178 	lcall	_delay
+      0003C3 74 58            [12] 1179 	mov	a,#0x58
+      0003C5 B5 23 F5         [24] 1180 	cjne	a,_spots,00114$
+      0003C8 74 58            [12] 1181 	mov	a,#0x58
+      0003CA B5 24 F0         [24] 1182 	cjne	a,(_spots + 0x0001),00114$
+                                   1183 ;	testparking.c:301: Consumer();
+      0003CD 12 01 CC         [24] 1184 	lcall	_Consumer
+                                   1185 ;	testparking.c:304: ThreadExit();
+                                   1186 ;	testparking.c:305: }
+      0003D0 02 04 FC         [24] 1187 	ljmp	_ThreadExit
+                                   1188 ;------------------------------------------------------------
+                                   1189 ;Allocation info for local variables in function '_sdcc_gsinit_startup'
+                                   1190 ;------------------------------------------------------------
+                                   1191 ;	testparking.c:307: void _sdcc_gsinit_startup(void) {
+                                   1192 ;	-----------------------------------------
+                                   1193 ;	 function _sdcc_gsinit_startup
+                                   1194 ;	-----------------------------------------
+      0003D3                       1195 __sdcc_gsinit_startup:
+                                   1196 ;	testparking.c:310: __endasm;
+      0003D3 02 03 DE         [24] 1197 	ljmp	_Bootstrap
+                                   1198 ;	testparking.c:311: }
+      0003D6 22               [24] 1199 	ret
+                                   1200 ;------------------------------------------------------------
+                                   1201 ;Allocation info for local variables in function '_mcs51_genRAMCLEAR'
+                                   1202 ;------------------------------------------------------------
+                                   1203 ;	testparking.c:313: void _mcs51_genRAMCLEAR(void) {}
+                                   1204 ;	-----------------------------------------
+                                   1205 ;	 function _mcs51_genRAMCLEAR
+                                   1206 ;	-----------------------------------------
+      0003D7                       1207 __mcs51_genRAMCLEAR:
+      0003D7 22               [24] 1208 	ret
+                                   1209 ;------------------------------------------------------------
+                                   1210 ;Allocation info for local variables in function '_mcs51_genXINIT'
+                                   1211 ;------------------------------------------------------------
+                                   1212 ;	testparking.c:314: void _mcs51_genXINIT(void) {}
+                                   1213 ;	-----------------------------------------
+                                   1214 ;	 function _mcs51_genXINIT
+                                   1215 ;	-----------------------------------------
+      0003D8                       1216 __mcs51_genXINIT:
+      0003D8 22               [24] 1217 	ret
+                                   1218 ;------------------------------------------------------------
+                                   1219 ;Allocation info for local variables in function '_mcs51_genXRAMCLEAR'
+                                   1220 ;------------------------------------------------------------
+                                   1221 ;	testparking.c:315: void _mcs51_genXRAMCLEAR(void) {}
+                                   1222 ;	-----------------------------------------
+                                   1223 ;	 function _mcs51_genXRAMCLEAR
+                                   1224 ;	-----------------------------------------
+      0003D9                       1225 __mcs51_genXRAMCLEAR:
+      0003D9 22               [24] 1226 	ret
+                                   1227 ;------------------------------------------------------------
+                                   1228 ;Allocation info for local variables in function 'timer0_ISR'
+                                   1229 ;------------------------------------------------------------
+                                   1230 ;	testparking.c:317: void timer0_ISR(void) __interrupt(1) {
+                                   1231 ;	-----------------------------------------
+                                   1232 ;	 function timer0_ISR
+                                   1233 ;	-----------------------------------------
+      0003DA                       1234 _timer0_ISR:
+                                   1235 ;	testparking.c:320: __endasm;
+      0003DA 02 05 65         [24] 1236 	ljmp	_myTimer0Handler
+                                   1237 ;	testparking.c:321: }
+      0003DD 32               [24] 1238 	reti
+                                   1239 ;	eliminated unneeded mov psw,# (no regs used in bank)
+                                   1240 ;	eliminated unneeded push/pop not_psw
+                                   1241 ;	eliminated unneeded push/pop dpl
+                                   1242 ;	eliminated unneeded push/pop dph
+                                   1243 ;	eliminated unneeded push/pop b
+                                   1244 ;	eliminated unneeded push/pop acc
+                                   1245 	.area CSEG    (CODE)
+                                   1246 	.area CONST   (CODE)
+                                   1247 	.area XINIT   (CODE)
+                                   1248 	.area CABS    (ABS,CODE)
+      000700                       1249 	.org 0x0700
+      000700                       1250 _Car:
+      000700 43 61 72 20           1251 	.ascii "Car "
+      000704 00                    1252 	.db 0x00
+      000710                       1253 	.org 0x0710
+      000710                       1254 _GotSpot:
+      000710 20 70 61 72 6B 73 20  1255 	.ascii " parks at spot "
+             61 74 20 73 70 6F 74
+             20
+      00071F 00                    1256 	.db 0x00
+      000720                       1257 	.org 0x0720
+      000720                       1258 _and:
+      000720 61 6E 64 20           1259 	.ascii "and "
+      000724 00                    1260 	.db 0x00
+      000730                       1261 	.org 0x0730
+      000730                       1262 _TimeUnit:
+      000730 20 61 74 20 74 69 6D  1263 	.ascii " at time unit: "
+             65 20 75 6E 69 74 3A
+             20
+      00073F 00                    1264 	.db 0x00
+      000740                       1265 	.org 0x0740
+      000740                       1266 _ExitSpot:
+      000740 20 65 78 69 74 73     1267 	.ascii " exits"
+      000746 00                    1268 	.db 0x00
